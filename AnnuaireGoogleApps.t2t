@@ -1,0 +1,99 @@
+
+% 14/11/2012
+% Notes sur la mise en place d'un script pour mettre à jour les numéros de téléphone d'un annuaire Google Apps.
+
+== Objectif ==
+
+L'objectif était d'ajouter les numéros de téléphones aux contacts d'un annuaire Google Apps.
+Ces notes expliquent un peu comment j'y suis arrivé ...
+
+== Public == 
+
+Curieux ?
+
+== Prérequis ==
+
+Pour aller au bout, il faut un compte avec les droits d'administration et que les API soient bien activées.
+
+== API Google ==
+
+Il y a pleins d'API qui tournent autours des Google App et des contacts. 
+Du coup, si on se précipite (ce que j'ai fait ...), on tourne un peu en rond.
+
+Les documentations sont plutôt bien faites et on trouve pas mal d'exemples de code. En fait, je pense qu'il faut juste savoir prendre son temps ...
+
+== Google Apps Provisioning API == 
+
+L'API [Google Apps Provisioning API https://developers.google.com/google-apps/provisioning/] permet de gérer les membres de le l'organisation.
+
+J'ai d'abord essayé avec cette dernière mais elle ne permet que de mettre à jour certaines informations. Elle est surtout là pour gérer les comptes utilisateurs.
+
+== Google Domain Shared Contacts API ==
+
+L'API [Google Domain Shared Contacts API https://developers.google.com/google-apps/domain-shared-contacts/] permet de gérer l'annuaire partagé. L'objet de cet annuaire est d'y mettre des contacts //"externes"//.
+Elle est prévue pour des personnes extérieures à l'organisation mais dont les informations sont utiles à tous.
+
+J'ai essayé de voir si ce n'était pas cette API mais elle est vraiment dédié uniquement aux contacts externes.
+
+== Google Apps Profiles API ==
+
+L'API [Google Apps Profiles API https://developers.google.com/google-apps/profiles/reference] permet de gérer les profils des utilisateurs de l'organisation.
+
+Cette fois, c'est la bonne ;)
+
+Comme toutes les API de chez Google, elle est accessibles en Java, Python et .NET mais aussi directement via des requêtes HTTP.
+
+== Curl ==
+
+Pour tester les API, il est parfois sympathique de pouvoire faire directement les requêtes HTTP.
+L'utilisation de [Curl http://curl.haxx.se] est bien décrite chez Google [Using Curl https://developers.google.com/gdata/articles/using_cURL].
+
+== Authentification ==
+
+Il existe plusieurs modes d'authentification pour accéder aux API.
+
+Le mode [ClientLogin https://developers.google.com/accounts/docs/AuthForInstalledApps] bien que déprécié est le plus simple à utiliser.
+Sinon, on il est conseillé d'utiliser OAuth.
+
+La [FAQ https://developers.google.com/gdata/faq#clientlogin] suivante permet de connaître les identifiants des services utile en mode ClientLogin.
+
+== Autres outils ==
+
+=== google-shared-contacts-client ===
+
+[google-shared-contacts-client http://code.google.com/p/google-shared-contacts-client/wiki/Usage] 
+est un outil en Python qui permet de mettre à jour l'annuaire à partir de CSV etc.
+
+=== Google Apps Directory Sync ===
+
+[Google Apps Directory Sync http://support.google.com/a/bin/answer.py?hl=fr&answer=106368] 
+est un outils en Java qui permet de mettre à jour l'annuaire à partir d'un annuaire LDAP ou (un AD).
+
+Google Apps Directory Sync est l'outils mis en avant par Google pour cette problématique. Par contre, les sources ne sont pas disponibles.
+
+== Le Graal ==
+
+J'ai attaqué l'API Google en Python et ait commis le [manage_phone.py https://github.com/mathieuroche/ManageGoogleDirectory]
+
+Pour importer, l'ensemble des contracts, j'ai utilisé un peu de shell:
+
+```
+cat phones_clt.csv | awk -F "," '{ print "python manage_phone.py",  $4}' > list.bash
+cat phones_clt.csv | awk -F "," '{ print "python manage_phone.py --update \""  $3  "\"" , $4}' > update.bash
+```
+
+== Mobile et annuaire Google ==
+
+Dans cette partie, j'explique comment accéder à ces nouvelles informations sur téléphone.
+
+=== Android ===
+
+Rien à faire. Par contre, les contacts sont accessibles uniquement dans le cas d'une recherche.
+
+=== Iphone ===
+
+??
+
+== Windows Phone ==
+
+??
